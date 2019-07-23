@@ -23,9 +23,24 @@ But first we need to install WSL2.
 The first thing we are going to do is enable the `Windows Insider Program`
 
 It can be enabled in the `Settings` > `Update and Security` > `Windows Insider Program`
+
+![settings](/assets/settings.png)
+
+![update_and_security](/assets/update_and_security.png)
+
+![insider_tab](/assets/insider_tab.png)
+
 - Login to your `Windows Insider account` or create one.
 - At the time of writing, WSL2 is in the `Fast` builds, so your `insider settings` should be set to `Fast`.
+
+![insider_fast](/assets/insider_fast.png)
+
 - Then go to `settings` > `Update and Security` > `Windows Update` and check for updates. Install the latest build, then restart your machine. This should take some time.
+
+![windows_update_tab](/assets/windows_update_tab.png)
+
+![check_for_updates](/assets/check_for_updates.png)
+
 - You should now have the latest updates, and with that comes WSL2. Next we will see how we can activate WSL2.
 
 ## WSL 1
@@ -39,7 +54,19 @@ Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-L
 ```
 When prompted to restart our machine, we just answer with [Y]es.
 
-After the computer restarted, we head to `the Microsoft Store` and search the term `linux`. After clicking on `Run Linux on Windows` we choose to get `ubuntu` as our linux distribution. Once ubuntu is installed, we launch. After a first initialization we are prompted for the `Unix username` and the `Unix password`. We then update ubuntu's package manager (this might take some time and you will be prompted for information twice, normally).
+After the computer restarted, we head to `the Microsoft Store` and search the term `linux`.
+
+![linux_store](/assets/linux_store.png)
+
+After clicking on `Run Linux on Windows` we choose to get `ubuntu` as our linux distribution.
+
+![get_ubuntu](/assets/get_ubuntu.png)
+
+Once ubuntu is installed, we launch it.
+
+![launch](/assets/launch.png)
+
+After a first initialization we are prompted for the `Unix username` and the `Unix password`. We then update ubuntu's package manager (this might take some time and you will be prompted for information twice, normally).
 
 ```zsh
 sudo apt update && sudo apt upgrade
@@ -114,6 +141,18 @@ I changed my theme to [the lambda theme](https://github.com/robbyrussell/oh-my-z
 
 `zsh` also comes with a set of plugins that could be useful to increase your development speed.  Completion plugins are also available for `npm`. Please refer to the [plugin page](https://github.com/robbyrussell/oh-my-zsh/wiki/Plugins) to find anything that suits you. I enjoy working with the [git plugin](https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/git/). Talking about git, it is the next tool we are going to install.
 
+__Note__: When running `sudo apt upgrade` or `sudo apt-get update`, the following error code could be encountered:
+
+```zsh
+E: Release file for https://download.docker.com/linux/ubuntu/dists/bionic/InRelease is not valid yet (invalid for another 15h 3min 13s). Updates for this repository will not be applied.
+```
+
+This is dues to a [known issue](https://github.com/microsoft/WSL/issues/4245) in WSL. A temporary fix is to call
+
+```zsh
+sudo hwclock -s
+```
+
 # Development tools
 
 ## git
@@ -161,6 +200,8 @@ ssh-add ~/.ssh/id_rsa
 
 After that we can add the key to a [github](https://help.github.com/en/enterprise/2.15/user/articles/adding-a-new-ssh-key-to-your-github-account) or a (gitlab)[https://docs.gitlab.com/ee/ssh/#adding-an-ssh-key-to-your-gitlab-account] account.
 
+__Note__: I currently need to run `eval "$(ssh-agent -s)"` and `ssh-add ~/.ssh/id_rsa` every time I restart my laptop. 
+
 Now that we installed git, we are sure that the code we write does not get lost. Now to write our code, let's install Visual Studio Code.
 
 ### Visual Studio Code
@@ -169,17 +210,15 @@ We browse (the Visual Studio Code website)[https://code.visualstudio.com/], down
 
 During the installation process, we make sure to check the box to add Visual Studio Code to the PATH, it is recommended for an extension we'll install later.
 
-Screenshot
-
- Next we open a terminal within VS Code. By default the terminal should be configured to be a `powershell`. We change it to `wsl`, which should then use `zsh` (or `bash` if you skipped the `zsh` section). 
+![add_to_path](/assets/add_to_path.png)
 
 Code comes with heaps of extensions, but the one we are interested in is [VS Code Remote Development](https://code.visualstudio.com/docs/remote/remote-overview). It bundles a few extensions that are useful for remote development, including `Remote - WSL` which will do some magic for us.
 
 In VS Code, in the extension tab we look for `Remote Development` and install it.
 
-Screenshot
+![remote_development](/assets/remote_development.png)
 
-In a `zsh` ternminal we browse to our home folder and create a `dev` folder:
+In a `zsh` terminal we browse to our home folder and create a `dev` folder:
 
 ```zsh
 cd ~ && mkdir dev && cd dev
@@ -193,6 +232,15 @@ code .
 
 It should open a new VS Code window, and install a VS Code server on our WSL. Once this is done, we can now create files in our editor and they will be created in the linux file system.
 This article is written using exactly this setup \o/
+
+![code_in_wsl](/assets/code_in_wsl.png)
+
+This last part is for those among us who installed `zsh`. Once VS Code is connected to WSL, it is possible to modify the default shell to be `zsh`. This will take effect after relaunching the terminal.
+
+![select_default_shell](/assets/select_default_shell.png)
+
+![select_default_shell_2](/assets/select_default_shell_2.png)
+
 
 Now that we have installed Visual Studio Code, let's install node.js
 
@@ -239,7 +287,7 @@ Our journey to set up our development environment is almost complete. The last t
 
 To install [docker](https://www.docker.com/), we will follow the [steps from the official documentation](https://docs.docker.com/install/linux/docker-ce/ubuntu/)
 
-First we update the `apt` package
+First we need to update `apt-get`
 
 ```zsh
 sudo apt-get update
@@ -321,9 +369,9 @@ Finally we check the installation by running
 docker-compose --version
 ```
 
-which should return a docker-compose version and a build id (`docker-compose version 1.24.1, build 1110ad01` at time of writing)
+which should return a docker-compose version and a build id (`docker-compose version 1.24.1, build 01010101` at time of writing)
 
-We now have a machine ready to create the craziest node apps from our windows machine. 
+We have now installed the tools for us to start developing node apps. WSL2 is currently only in beta mode, so we will most likely encounter [issues](https://github.com/microsoft/WSL/issues). Don't hesitate to report any issue encountered (double checking first if the issue has been encountered yet).
 
 I hope that you enjoyed this article, the first one I ever wrote. Feel free to leave some feedback.
 
